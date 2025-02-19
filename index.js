@@ -61,7 +61,7 @@ app.put("/prestadorServico/:id", (req, res) => {
         return res.status(404).json({msg: "prestador de serviço não encontrado!"});
     }
     prestadorServico.nome = novoNome || prestadorServico.nome;
-    prestadorServico.especialidade = novoEspecialidade || prestadorServico.disponibilidade;
+    prestadorServico.especialidade = novoEspecialidade || prestadorServico.especialidade;
     prestadorServico.telefone = novoTelefone || prestadorServico.telefone;
     prestadorServico.email = novoEmail || prestadorServico.email;
     prestadorServico.disponibilidade = novoDisponibilidade || prestadorServico.disponibilidade;
