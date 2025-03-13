@@ -87,12 +87,12 @@ app.delete("/prestadorservico/:id", async (req, res) => {
         const consulta1 = `SELECT * FROM prestadorservico WHERE id = $1`
         const resultado1 = await pool.query(consulta1, parametro)
         if (resultado1.rows.length === 0) {
-            return res.status(200).json({msg: "Prestador de serviço não encontrado!"})
+            return res.status(200).json({msg: "Prestador de serviço não encontrado"})
         }
         const dados2 = [id]
         const consulta2 = `DELETE FROM prestadorservico WHERE id = $1`
         await pool.query(consulta2, dados2)
-        res.status(200).json({msg: "Prestador de serviço deletado com sucesso"})
+        res.status(200).json({msg: "Prestador de serviço deletado com sucesso!"})
     } catch (error) {
         res.status(500).json({msg: "Erro ao excluir prestador de serviço!", erro: error.message})
     }
@@ -102,7 +102,7 @@ app.listen(port, () => {
     console.log(`Servidor rodando com sucesso em http://localhost:${port}`);
 });
 
-
+//atualizado com o banco de dados 
 
 
 
