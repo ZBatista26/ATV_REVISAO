@@ -11,9 +11,9 @@ app.use(express.json());
 
 // const bancoDados = [];
 
-app.get("/prestadorservico", async (req, res) => {
+app.get("/profissionais", async (req, res) => {
     try {
-        const consulta =  `SELECT * FROM prestadorservico`
+        const consulta =  `SELECT * FROM profissionais`
         const buscando = await pool.query(consulta)
         if (buscando.rows.length === 0) {
             return res.status(200).json({msg: "Banco de dados vazio"})
@@ -24,11 +24,11 @@ app.get("/prestadorservico", async (req, res) => {
     }
 });
 
-app.get("/prestadorservico/:id", async (req, res) => {
+app.get("/profissionais/:id", async (req, res) => {
     try {
         const id = req.params.id;
         const dados1 = [id];
-        const consulta1 = `SELECT * FROM prestadorservico WHERE id = $1`;
+        const consulta1 = `SELECT * FROM profissionais WHERE id = $1`;
         const resultado1 = await pool.query(consulta1, dados1);
         if(resultado1.rows.length === 0) {
             return res.status(404).json({msg: "Prestador de serviço não encontrado."});
@@ -39,16 +39,16 @@ app.get("/prestadorservico/:id", async (req, res) => {
     }
 });
 
-app.post("/prestadorservico", async (req, res) => {
+app.post("/profissionais", async (req, res) => {
     try {
         const {nome, especialidade, telefone, email, disponibilidade} = req.body;
         if (!nome || !especialidade || !telefone || !email || !disponibilidade) {
             return res.status(200).json({msg: "Todos os dados devem ser preenchidos!"});
         }
-        const novoPrestadorservico = [nome, especialidade, telefone, email, disponibilidade];
-        const consulta = `insert into prestadorservico (nome, especialidade, 
+        const novoprofissionais = [nome, especialidade, telefone, email, disponibilidade];
+        const consulta = `insert into profissionais (nome, especialidade, 
                             telefone, email, disponibilidade) values ($1, $2, $3, $4, $5) returning*`
-        await pool.query(consulta, novoPrestadorservico);
+        await pool.query(consulta, novoprofissionais);
 
         res.status(201).json({msg: "Prestador de serviço cadastrado com sucesso!"});
     } catch (error) {
@@ -57,7 +57,7 @@ app.post("/prestadorservico", async (req, res) => {
         });
     }
 });
-app.put("/prestadorservico/:id", async (req, res) => {
+app.put("/profissionais/:id", async (req, res) => {
     try {
         const id = req.params.id;
     const {novoNome, novoEspecialidade, novoTelefone, novoEmail, novaDisponibilidade} = req.body;
@@ -65,14 +65,14 @@ app.put("/prestadorservico/:id", async (req, res) => {
         return res.status(404).json({msg: "Informe o parametro"});
     }
     const dados1 = [id]
-    const consulta1 = `SELECT * FROM prestadorservico WHERE id = $1`
+    const consulta1 = `SELECT * FROM profissionais WHERE id = $1`
     const resultado1 = await pool.query(consulta1, dados1)
     if (resultado1.rows.length === 0) {
         return res.status(404).json({msg: "prestador de serviço não encontrado!"});
     }
 
     const dados2 = [id, novoNome, novoEspecialidade, novoTelefone, novoEmail, novaDisponibilidade]
-    const consulta2 = `UPDATE prestadorservico set nome = $2, especialidade = $3, telefone = $4, email = $5, disponibilidade = $6 WHERE id = $1`
+    const consulta2 = `UPDATE profissionais set nome = $2, especialidade = $3, telefone = $4, email = $5, disponibilidade = $6 WHERE id = $1`
     await pool.query(consulta2, dados2)
     res.status(200).json({msg: "Dados do prestador de serviço atualizado com sucesso!"})
     } catch (error) {
@@ -80,17 +80,17 @@ app.put("/prestadorservico/:id", async (req, res) => {
     }
 });
 
-app.delete("/prestadorservico/:id", async (req, res) => {
+app.delete("/profissionais/:id", async (req, res) => {
     try {
         const id = req.params.id;
         const parametro = [id]
-        const consulta1 = `SELECT * FROM prestadorservico WHERE id = $1`
+        const consulta1 = `SELECT * FROM profissionais WHERE id = $1`
         const resultado1 = await pool.query(consulta1, parametro)
         if (resultado1.rows.length === 0) {
             return res.status(200).json({msg: "Prestador de serviço não encontrado"})
         }
         const dados2 = [id]
-        const consulta2 = `DELETE FROM prestadorservico WHERE id = $1`
+        const consulta2 = `DELETE FROM profissionais WHERE id = $1`
         await pool.query(consulta2, dados2)
         res.status(200).json({msg: "Prestador de serviço deletado com sucesso!"})
     } catch (error) {
