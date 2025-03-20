@@ -102,7 +102,7 @@ app.listen(port, () => {
     console.log(`Servidor rodando com sucesso em http://localhost:${port}`);
 });
 
-//atualizado com o banco de dados 
+
 
 
 
