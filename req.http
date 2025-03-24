@@ -1,16 +1,15 @@
 ### Rota para buscar tosos os prestadores de serviço
-GET http://localhost:3000/prestadorservico
+GET http://localhost:3000/profissionais
 Content-Type: application/json
 
 ### Fechamento da rota de buscar todos os livros
 
 ### Rota para cadastrar os prestadores de serviço
 
-POST http://localhost:3000/prestadorservico
+POST http://localhost:3000/profissionais
 Content-Type: application/json
 
 {
-    "id":"2",
     "nome":"Francisco",
     "especialidade":"Tec.Desenvolvimento de sistemas",
     "telefone":99601461,
@@ -22,7 +21,7 @@ Content-Type: application/json
 
 ### Rota para atualizar dados do servidor
 
-PUT http://localhost:3000/prestadorservico/6
+PUT http://localhost:3000/profissionais/1
 Content-Type: application/json
 
 {
@@ -37,14 +36,14 @@ Content-Type: application/json
 
 ### rota para buscar prestador de serviço pelo id
 
-GET http://localhost:3000/prestadorservico/6
+GET http://localhost:3000/profissionais/1
 Content-Type: application/json
 
 ### fechamento da rota de buscar pstador de serviço pelo id
 
 ### Rota para deletar prestador de serviço
 
-DELETE http://localhost:3000/prestadorservico/7
+DELETE http://localhost:3000/profissionais/1
 Content-Type: application/json
 
 ### fechamento da rota para deletar prestador de serviço
