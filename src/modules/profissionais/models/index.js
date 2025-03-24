@@ -3,7 +3,7 @@ const { pool } = require('../../../config/database')
 class ProfissionaisModel {
     static async criar(nome, especialidade, telefone, email, disponibilidade) {
         const dados = [nome, especialidade, telefone, email, disponibilidade]
-        const consulta = `INSERT into profissionais(nome, especialidade, telefone, email, disponibilidade) values($1, $2, $3, $4, $5) returninig *`
+        const consulta = `INSERT into profissionais(nome, especialidade, telefone, email, disponibilidade) values($1, $2, $3, $4, $5) returning *`
         const novoProfissional = await pool.query(consulta, dados)
         return novoProfissional.rows
     }
