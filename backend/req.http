@@ -11,7 +11,7 @@ Content-Type: application/json
 
 {
     "nome":"Francisco",
-    "especialidade":"Tec.Desenvolvimento de sistemas",
+    "especialidade":"Pintor",
     "telefone":99601461,
     "email":"franciscobatista744@email.com",
     "disponibilidade":"sim"
