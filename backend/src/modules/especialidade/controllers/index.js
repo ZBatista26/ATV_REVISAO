@@ -8,7 +8,7 @@ class EspecialidadeController {
                 return res.status(400).json({msg: "Todos os campos devem ser preenchidos"})
             }
             const novaEspecialidade = await EspecialidadeModel.criarEspecialidade(nome);
-            res.status(201).json({msg: "Especialidade criar com sucesso!", especialidades: novaEspecialidade})
+            res.status(201).json({msg: "Especialidade criada com sucesso!", especialidades: novaEspecialidade})
         } catch (error) {
             res.status(500).json({msg: 'Problema interno do servidor. Por favor tente mais tarde!', erro: error.message });
         }

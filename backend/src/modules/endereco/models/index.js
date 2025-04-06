@@ -22,7 +22,7 @@ class EnderecoModel{
         return resultado.rows
     }
 
-    static async AtualizarEndereco(id_profissional, cep, numero, ponto_referencia){
+    static async atualizarEndereco(id_profissional, cep, numero, ponto_referencia){
         const resposta = await axios.get(`http://viacep.com.br/ws/${cep}/json/`)
         const {logradouro, complemento, bairro, localidade, uf} = resposta.data
         const dados = [

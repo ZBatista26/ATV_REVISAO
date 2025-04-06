@@ -13,15 +13,15 @@ class EnderecoController{
             res.status(500).json({ mensagem: 'Problema interno do servidor. Por favor tente mais tarde!', erro: error.message })
         }
     }
-    
-    static async AtualizarEndereco(req, res){
+
+    static async atualizarEndereco(req, res){
         try {
             const id_profissional = req.params.id_profissional
             const {cep, numero, ponto_referencia} = req.body
             if (!cep || !numero) {
                 return res.status(400).json({msg: 'Todos os campos devem ser preenchidos'})
             }
-            const endereco = await EnderecoModel.editarEndereco(id_profissional, cep, numero, ponto_referencia)
+            const endereco = await EnderecoModel.atualizarEndereco(id_profissional, cep, numero, ponto_referencia)
             if (endereco.length === 0){
                 return res.status(400).json({msg: 'Endereco não encontrado'})
             }

@@ -1,84 +1,123 @@
-const ProfissionaisModel = require ('../models/index')
+const ProfissionalModel = require('../models/index');
+const EspecialidadeModel = require('../../especialidade/models/index');
+const { pool } = require('../../../config/database');
 
-class ProfissionaisController{
-    static async criar(req, res){
+
+class ProfissionalController {
+    static async criar(req, res) {
         try {
-            const {nome, especialidade, telefone, email, disponibilidade} = req.body
-            if  (!nome || !especialidade || !telefone || !email || !disponibilidade) {
-                return res.status(400).json({msg: "Todos os campos devem ser preenchidos!"})
+            const { nome, telefone, email, disponibilidade, especialidade } = req.body;
+
+            if (!nome || !telefone || !email || !disponibilidade) {
+                return res.status(400).json({ msg: "Todos os campos devem ser preenchidos!" });
             }
-            const novoProfissional = await ProfissionaisModel.criar(nome, especialidade, telefone, email, disponibilidade)
-            res.status(201).json({msg: "Profissional cadastrado com sucesso!", profissional: novoProfissional})
+
+            const [novoProfissional] = await ProfissionalModel.criar(nome, telefone, email, disponibilidade);
+
+            if (Array.isArray(especialidade) && especialidade.length > 0) {
+                for (const id_especialidade of especialidade) {
+                    await EspecialidadeModel.vincularEspecialidadeAoProfissional(novoProfissional.id, id_especialidade);
+                }
+            }
+
+            res.status(201).json({ msg: "Profissional cadastrado com sucesso!", profissional: novoProfissional });
         } catch (error) {
-            res.status(500).json({msg: "Erro ao cadastrar profissional!", erro: error.message})
+            res.status(500).json({ msg: "Erro ao cadastrar profissional!", erro: error.message });
         }
     }
 
-    static async listarTodos(req, res){
+    static async listarTodos(req, res) {
         try {
-            const profissionais = await ProfissionaisModel.listar()
-            if(profissionais.length === 0){ //const profissional = await ProfissionaisModel.listarPorID(id); if (profissional.length === 0) { ... }
-                return res.status(400).json({msg: "Não foi encontarado nenhum profissional"})
+            const profissionais = await ProfissionalModel.listar();
+
+            if (profissionais.length === 0) {
+                return res.status(204).json({ msg: "Nenhum profissional encontrado." });
             }
-            res.status(200).json(profissionais)
+
+            const profissionaisComEspecialidades = await Promise.all(
+                profissionais.map(async (prof) => {
+                    const especialidades = await EspecialidadeModel.listarEspecialidadesPorProfissional(prof.id);
+                    return { ...prof, especialidades };
+                })
+            );
+
+            res.status(200).json(profissionaisComEspecialidades);
         } catch (error) {
-            res.status(500).json({msg: "Erro ao listar profissionais.", erro: error.message})
+            res.status(500).json({ msg: "Erro ao listar profissionais.", erro: error.message });
         }
     }
 
-    static async listarPorID(req, res){
-       try {
-        const id = req.params.id;
-        const profissional = await ProfissionaisModel.listarPorID(id);
-        if (!profissional){
-            return res.status(400).json({msg: "Profissional não encontrado"})
+    static async listarPorID(req, res) {
+        try {
+            const id = req.params.id;
+            const [profissional] = await ProfissionalModel.listarPorID(id);
+
+            if (!profissional) {
+                return res.status(404).json({ msg: "Profissional não encontrado." });
+            }
+
+            const especialidades = await EspecialidadeModel.listarEspecialidadesPorProfissional(id);
+
+            res.status(200).json({ ...profissional, especialidades });
+        } catch (error) {
+            res.status(500).json({ msg: "Erro ao listar profissional!", erro: error.message });
         }
-        res.status(201).json({profissional})
-       } catch (error) {
-        res.status(500).json({msg: "Erro ao Listar profissional!", erro: error.message})
-       }
     }
 
     static async editar(req, res) {
         try {
             const id = req.params.id;
-            const {nome, especialidade, telefone, email, disponibilidade} = req.body;
+            const { nome, telefone, email, disponibilidade, especialidade } = req.body;
 
-            if (!nome && !especialidade && !telefone && !email && !disponibilidade) {
-                return res.status(400).json({msg: "Pelo menos um campo deve ser atualizado" });
+            const campos = { nome, telefone, email, disponibilidade };
+            const algumCampoPreenchido = Object.values(campos).some(v => v !== undefined);
+
+            if (!algumCampoPreenchido && !Array.isArray(especialidade)) {
+                return res.status(400).json({ msg: "Pelo menos um campo deve ser atualizado." });
             }
-            const profissionalAtualizado = await ProfissionaisModel.editar (id, { nome, especialidade, telefone, email, disponibilidade});
-            if (!profissionalAtualizado) { //const profissionalAtualizado = await ProfissionaisModel.Editar(id, nome, especialidade, telefone, email, disponibilidade);
-                return res.status(400).json({msg: "Profisssional não encontrado." });
+
+            const [profissionalAtualizado] = await ProfissionalModel.editar(id, nome, telefone, email, disponibilidade);
+
+            if (!profissionalAtualizado) {
+                return res.status(404).json({ msg: "Profissional não encontrado." });
             }
-            res.status(200).json({msg: "profissional atualizado com sucesso", profissional: profissionalAtualizado});
+
+            if (Array.isArray(especialidade)) {
+                await EspecialidadeModel.removerVinculosDoProfissional(id);
+
+                for (const id_especialidade of especialidade) {
+                    await EspecialidadeModel.vincularEspecialidadeAoProfissional(id, id_especialidade);
+                }
+            }
+
+            res.status(200).json({ msg: "Profissional atualizado com sucesso", profissional: profissionalAtualizado });
         } catch (error) {
-            res.status(500).json({msg: "Erro ao editar profissional.", erro: error.message });
+            res.status(500).json({ msg: "Erro ao editar profissional.", erro: error.message });
         }
     }
 
     static async excluirPorID(req, res) {
         try {
             const id = req.params.id;
-            const profissionalExcluido = await ProfissionaisModel.excluirPorID(id);
-            if (!profissionalExcluido) {
-                return res.status(400).json({msg: "profissional não encontrado." });
-            }
-            res.status(200).json({msg: "profisssional excluído com sucesso." });
+
+            await EspecialidadeModel.removerVinculosDoProfissional(id);
+            await ProfissionalModel.excluirPorID(id);
+
+            res.status(200).json({ msg: "Profissional excluído com sucesso." });
         } catch (error) {
-            res.status(500).json({msg: "Erro ao excluir profissional.", erro: error.message });
+            res.status(500).json({ msg: "Erro ao excluir profissional.", erro: error.message });
         }
     }
 
     static async excluirTodos(req, res) {
         try {
-            await ProfissionaisModel.excluirTodos();
-            res.status(200).json({msg: "Todos os profissionais foram excluídos com sucesso." });
+            await pool.query(`DELETE FROM profissional_especialidade`);
+            await ProfissionalModel.excluirTodos();
+            res.status(200).json({ msg: "Todos os profissionais foram excluídos com sucesso." });
         } catch (error) {
-            res.status(500).json({msg: "Erro ao excluir todos os profissionais.", erro: error.message });
+            res.status(500).json({ msg: "Erro ao excluir todos os profissionais.", erro: error.message });
         }
     }
-
 }
 
-module.exports = ProfissionaisController;
+module.exports = ProfissionalController;

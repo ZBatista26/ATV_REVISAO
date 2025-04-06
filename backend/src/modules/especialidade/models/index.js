@@ -28,6 +28,10 @@ class EspecialidadeModel {
         const resultado = await pool.query(consulta, dados);
         return resultado.rows;
     }
+
+    static async removerVinculosDoProfissional(id_profissional) {
+        await pool.query(`DELETE FROM profissional_especialidade WHERE id_profissional = $1`, [id_profissional]);
+    }
 }
 
 module.exports = EspecialidadeModel;
