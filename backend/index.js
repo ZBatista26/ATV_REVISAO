@@ -2,8 +2,8 @@ const express = require('express');
 const dotenv = require('dotenv');
 const { pool } = require('./src/config/database');
 
-const profissionalRoutes = require('./src/modules/profissional/routes/profissional.routes');
-const especialidadeRoutes = require('./src/modules/especialidade/routes/especialidade.routes');
+const profissionalRoutes = require('./src/modules/profisssional/routes/index');
+const especialidadeRoutes = require('./src/modules/especialidade/routes/index');
 
 dotenv.config();
 
